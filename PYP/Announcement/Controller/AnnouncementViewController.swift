@@ -39,13 +39,55 @@ class AnnouncementViewController: UICollectionViewController, UICollectionViewDe
     private func bidRegister(id: String) {
         service.bidRegister(id: id) { [weak self] result in
             guard let self else { return }
-            switch result {
-                case .success:
-                self.showSuccess(message: "您的登记已提交")
-                case .failure(let err):
-                self.showError(message: err.message)
+            if case .retry = result {
+                self.bidRegisterRetryCompletion(id)
+            } else {
+                self.bidRegisterSuccessOrFailureCompletion(result)
             }
         }
+    }
+
+    private func retryBidRegister(id: String) {
+        service.retryBidRegister(id: id) { [weak self] result in
+            switch result {
+            case .success:
+                self?.showSuccess(message: "您的登记已提交")
+            case .failure(let err):
+                self?.showError(message: err.message)
+            }
+        }
+    }
+
+    private func bidRegisterSuccessOrFailureCompletion(
+        _ result: AnnouncementService.BidRegisterStatus
+    ) {
+        switch result {
+        case .success:
+            showSuccess(message: "您的登记已提交")
+        case .failure(let err):
+            showError(message: err.message)
+        case .retry: break
+        }
+    }
+
+    private func bidRegisterRetryCompletion(_ id: String) {
+        showRetryAlert(message: "可能发生了错误，请重试") { [weak self] in
+            self?.retryBidRegister(id: id)
+        }
+    }
+
+    private func showRetryAlert(message: String?, completion: @escaping () -> Void) {
+        let alert = UIAlertController(title: "", message: message, preferredStyle: .alert)
+        alert.addAction(
+            .init(
+                title: "OK",
+                style: .default,
+                handler: { _ in
+                    completion()
+                }
+            )
+        )
+        present(alert, animated: true)
     }
 
     // MARK: UICollectionViewDataSource

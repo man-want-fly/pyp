@@ -44,7 +44,7 @@ final class AnnouncementViewControllerTests: XCTestCase {
 
         controller?.service.bidRegister(id: "") { result in
 
-            XCTAssertEqual(try! result.get().id, register.id)
+            XCTAssertEqual(result.id, register.id)
 
             expect.fulfill()
         }

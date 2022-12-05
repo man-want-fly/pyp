@@ -44,6 +44,31 @@ final class AnnouncementServiceTests: XCTestCase {
 
         service?.bidRegister(id: "") { result in
 
+            XCTAssertEqual(result.id, register.id)
+
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 30)
+    }
+
+    func testSuccessfullyFetchBidRegister() throws {
+        let register = BidRegister(id: "1")
+        let wrapper = ModelWrapper(data: register, message: "success", code: 200)
+
+        let expect = expectation(description: "request /bid-rfps/1")
+
+        stub(condition: isPath("/bid-rfps/1")) { _ in
+            let data = try! JSONEncoder().encode(wrapper)
+            return .init(
+                data: data,
+                statusCode: 200,
+                headers: ["Content-Type": "application/json"]
+            )
+        }
+
+        service?.fetchBidRegisters(id: "1") { result in
+
             XCTAssertEqual(try! result.get().id, register.id)
 
             expect.fulfill()
@@ -67,6 +92,30 @@ final class AnnouncementServiceTests: XCTestCase {
         }
 
         service?.bidRegister(id: "") { result in
+
+            XCTAssertNotNil(result.error)
+
+            expect.fulfill()
+        }
+
+        waitForExpectations(timeout: 30)
+    }
+
+    func testFailedFetchBidRegister() throws {
+        let wrapper = ModelWrapper<BidRegister>(data: nil, message: "success", code: 400)
+
+        let expect = expectation(description: "request /bid-rfps/1 succeed with error code")
+
+        stub(condition: isPath("/bid-rfps/1")) { _ in
+            let data = try! JSONEncoder().encode(wrapper)
+            return .init(
+                data: data,
+                statusCode: 200,
+                headers: ["Content-Type": "application/json"]
+            )
+        }
+
+        service?.fetchBidRegisters(id: "1") { result in
 
             XCTAssertNotNil(result.error)
 

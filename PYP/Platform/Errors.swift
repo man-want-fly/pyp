@@ -14,6 +14,8 @@ extension Networking {
         case decodeFailed
         case network
         case noAvailableData
+        case timeout
+        case retryOut
         case unknown
         case underlying(message: String?)
 
@@ -23,6 +25,8 @@ extension Networking {
             case .decodeFailed: return "数据解析失败"
             case .network: return "网络出错了"
             case .noAvailableData: return "无可用数据"
+            case .timeout: return "超时"
+            case .retryOut: return "重试次数超限"
             case .unknown: return "未知错误"
             case .underlying(let msg):
                 if let msg {

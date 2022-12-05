@@ -16,5 +16,5 @@ struct Announcement: Identifiable, Codable {
 }
 
 struct BidRegister: Identifiable, Codable {
-    let id: String
+    let id: String?
 }

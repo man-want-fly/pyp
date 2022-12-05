@@ -43,6 +43,9 @@ class Networking {
     ) {
         session.dataTask(with: urlRequest) { data, response, error in
             DispatchQueue.main.async {
+                if let err = error as? URLError, err.code == .timedOut {
+                    return completion(.failure(.timeout))
+                }
                 guard
                     let response = response as? HTTPURLResponse,
                     response.statusCode == 200
